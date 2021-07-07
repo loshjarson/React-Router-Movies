@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useLocation } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 export default function Movie(props) {
+  const {saved, setSaved} = props;
   const [movie, setMovie] = useState();
-  const {pathname} = useLocation();
+  const {id} = useParams();
   // Change ^^^ that line and use a hook to obtain the :id parameter from the URL
 
   useEffect(() => {
     axios
-      .get(`http://localhost:5000/api${pathname}`) // Study this endpoint with Postman
+      .get(`http://localhost:5000/api/movies/${id}`) // Study this endpoint with Postman
       .then(response => {
         setMovie(response.data)
         // Study this response with a breakpoint or log statements
@@ -20,10 +21,16 @@ export default function Movie(props) {
       });
     // This effect should run every time time
     // the `id` changes... How could we do this?
-  }, []);
+  }, [id]);
 
   // Uncomment this only when you have moved on to the stretch goals
-  // const saveMovie = evt => { }
+  const saveMovie = evt => {
+    if (!saved.some(item => evt.id === item.id)) {
+      setSaved([...saved, evt])
+    } else{
+      console.log("already saved")
+    }
+   }
 
   if (!movie) {
     return <div>Loading movie information...</div>;
@@ -49,7 +56,7 @@ export default function Movie(props) {
           </div>
         ))}
       </div>
-      <div className="save-button">Save</div>
+      <div className="save-button" onClick={() => {saveMovie(movie)}}>Save</div>
     </div>
   );
 }
